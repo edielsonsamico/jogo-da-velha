@@ -1,51 +1,61 @@
 import streamlit as st
 from random import randrange
 
-# Configuração da página e layout
-st.set_page_config(page_title="Jogo da Velha Moderno", page_icon="🎮", layout="centered")
+# Configuração da página e layout centralizado
+st.set_page_config(page_title="Jogo da Velha Tradicional", page_icon="🎲", layout="centered")
 
-# Estilos CSS personalizados para um visual incrível
+# Estilos CSS avançados para simular um tabuleiro real com linhas de grade
 st.markdown("""
     <style>
     .main-title {
         text-align: center;
         font-family: 'Helvetica Neue', sans-serif;
-        color: #1f77b4;
-        font-weight: 700;
-        margin-bottom: 5px;
+        color: #2c3e50;
+        font-weight: 800;
+        margin-bottom: 0px;
     }
     .subtitle {
         text-align: center;
-        color: #666;
-        margin-bottom: 30px;
+        color: #7f8c8d;
+        margin-bottom: 25px;
+        font-size: 16px;
     }
-    /* Estilo customizado para os botões do tabuleiro */
+    /* Estilização profissional dos botões do tabuleiro simulando casas reais */
     div.stButton > button {
         width: 100%;
-        height: 100px;
-        font-size: 42px;
+        height: 110px;
+        font-size: 48px;
         font-weight: bold;
-        border-radius: 15px;
-        border: 2px solid #e2e8f0;
-        background-color: #ffffff;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s ease-in-out;
+        border-radius: 12px;
+        border: 3px solid #34495e;
+        background-color: #fdfefe;
+        color: #2c3e50;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        transition: all 0.15s ease-in-out;
     }
     div.stButton > button:hover {
-        border-color: #3182ce;
-        background-color: #ebf8ff;
-        transform: translateY(-2px);
+        border-color: #2980b9;
+        background-color: #ebf5fb;
+        transform: scale(1.02);
+    }
+    /* Estilo para destacar o botão de reiniciar */
+    .stButton.restart-btn > button {
+        height: 50px;
+        font-size: 18px;
+        background-color: #2c3e50;
+        color: white;
+        border: none;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 class='main-title'>🎮 Jogo da Velha</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Desafie a inteligência artificial direto no seu navegador!</div>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🎲 Jogo da Velha Tradicional</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>A experiência clássica de tabuleiro direto no seu navegador</div>", unsafe_allow_html=True)
 
 # Inicialização do estado do jogo
 if 'board' not in st.session_state:
     st.session_state.board = [[3 * j + i + 1 for i in range(3)] for j in range(3)]
-    st.session_state.board[1][1] = 'X'  # Computador começa no meio
+    st.session_state.board[1][1] = 'X'  # O computador começa no centro
     st.session_state.game_over = False
     st.session_state.winner = None
 
@@ -94,12 +104,12 @@ def computer_turn():
             st.session_state.game_over = True
             st.session_state.winner = 'tie'
 
-# Centralizando o tabuleiro com colunas extras nas pontas
-_, col_center, _ = st.columns([1, 3, 1])
+# Estrutura centralizada simulando a moldura do tabuleiro real
+_, col_center, _ = st.columns([1, 2.8, 1])
 
 with col_center:
-    # Botão de Reiniciar alinhado
-    if st.button("🔄 Reiniciar Partida", use_container_width=True):
+    # Botão de Nova Partida
+    if st.button("🔄 Nova Partida", use_container_width=True):
         st.session_state.board = [[3 * j + i + 1 for i in range(3)] for j in range(3)]
         st.session_state.board[1][1] = 'X'
         st.session_state.game_over = False
@@ -108,24 +118,26 @@ with col_center:
 
     st.write("")
 
-    # Renderização do Tabuleiro 3x3 em formato de grelha limpa
+    # Renderização das 3 linhas e 3 colunas formandos a grelha do tabuleiro
     board = st.session_state.board
     for row in range(3):
         cols = st.columns(3)
         for col in range(3):
             cell_value = board[row][col]
             
-            # Formatação visual das peças
-            label = cell_value
+            # Formatação visual das peças no tabuleiro
             if cell_value == 'O':
-                label = "🔵 O"
+                display_text = "🔵"  # Sua peça (Azul)
             elif cell_value == 'X':
-                label = "❌ X"
-
-            if cell_value in ['X', 'O'] or st.session_state.game_over:
-                cols[col].button(label, key=f"btn_{row}_{col}", disabled=True)
+                display_text = "❌"  # Peça do Computador (Vermelho/Cruz)
             else:
-                if cols[col].button(label, key=f"btn_{row}_{col}"):
+                display_text = str(cell_value)  # Número da casa vazia
+
+            # Renderiza o botão correspondente à casa do tabuleiro
+            if cell_value in ['X', 'O'] or st.session_state.game_over:
+                cols[col].button(display_text, key=f"cell_{row}_{col}", disabled=True)
+            else:
+                if cols[col].button(display_text, key=f"cell_{row}_{col}"):
                     st.session_state.board[row][col] = 'O'
                     
                     victor = victory_for(st.session_state.board, 'O')
@@ -141,13 +153,13 @@ with col_center:
 
     st.write("")
 
-    # Mensagens de Status / Resultado estilizadas
+    # Painel de Status / Resultado da Partida
     if st.session_state.game_over:
         if st.session_state.winner == 'you':
-            st.success("🎉 Parabéns! Você venceu a partida!")
+            st.success("🎉 Vitória espetacular! Você venceu o jogo!")
         elif st.session_state.winner == 'me':
-            st.error("🤖 O computador levou a melhor desta vez!")
+            st.error("🤖 O computador fechou o espaço e venceu!")
         else:
-            st.warning("🤝 Empate! Jogo equilibrado.")
+            st.warning("🤝 Fim de jogo: Empate técnico no tabuleiro!")
     else:
-        st.info("Sua vez! Escolha uma casa numérica (Você é o 🔵 O).")
+        st.info("Sua vez de jogar! Clique em um número para posicionar sua peça (🔵).")
