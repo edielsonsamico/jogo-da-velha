@@ -1,10 +1,10 @@
 import streamlit as st
 from random import randrange
 
-# Configuração da página e layout centralizado
+# Configuração da página
 st.set_page_config(page_title="Jogo da Velha Tradicional", page_icon="🎲", layout="centered")
 
-# Estilos CSS avançados para simular um tabuleiro real com linhas de grade
+# Estilos CSS otimizados para garantir botões quadrados perfeitos e centralizados
 st.markdown("""
     <style>
     .main-title {
@@ -17,14 +17,15 @@ st.markdown("""
     .subtitle {
         text-align: center;
         color: #7f8c8d;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         font-size: 16px;
     }
-    /* Estilização profissional dos botões do tabuleiro simulando casas reais */
+    /* Força os botões do tabuleiro a ficarem com formato quadrado e centralizados */
     div.stButton > button {
-        width: 100%;
-        height: 110px;
-        font-size: 48px;
+        width: 100% !important;
+        aspect-ratio: 1 / 1 !important;
+        height: auto !important;
+        font-size: 42px !important;
         font-weight: bold;
         border-radius: 12px;
         border: 3px solid #34495e;
@@ -32,19 +33,14 @@ st.markdown("""
         color: #2c3e50;
         box-shadow: 0 4px 8px rgba(0,0,0,0.08);
         transition: all 0.15s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     div.stButton > button:hover {
         border-color: #2980b9;
         background-color: #ebf5fb;
-        transform: scale(1.02);
-    }
-    /* Estilo para destacar o botão de reiniciar */
-    .stButton.restart-btn > button {
-        height: 50px;
-        font-size: 18px;
-        background-color: #2c3e50;
-        color: white;
-        border: none;
+        transform: scale(1.03);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -104,8 +100,8 @@ def computer_turn():
             st.session_state.game_over = True
             st.session_state.winner = 'tie'
 
-# Estrutura centralizada simulando a moldura do tabuleiro real
-_, col_center, _ = st.columns([1, 2.8, 1])
+# Estrutura centralizada para o tabuleiro
+_, col_center, _ = st.columns([1, 2.2, 1])
 
 with col_center:
     # Botão de Nova Partida
@@ -118,22 +114,20 @@ with col_center:
 
     st.write("")
 
-    # Renderização das 3 linhas e 3 colunas formandos a grelha do tabuleiro
+    # Renderização da grelha 3x3 com proporção perfeita
     board = st.session_state.board
     for row in range(3):
         cols = st.columns(3)
         for col in range(3):
             cell_value = board[row][col]
             
-            # Formatação visual das peças no tabuleiro
             if cell_value == 'O':
-                display_text = "🔵"  # Sua peça (Azul)
+                display_text = "🔵"
             elif cell_value == 'X':
-                display_text = "❌"  # Peça do Computador (Vermelho/Cruz)
+                display_text = "❌"
             else:
-                display_text = str(cell_value)  # Número da casa vazia
+                display_text = str(cell_value)
 
-            # Renderiza o botão correspondente à casa do tabuleiro
             if cell_value in ['X', 'O'] or st.session_state.game_over:
                 cols[col].button(display_text, key=f"cell_{row}_{col}", disabled=True)
             else:
@@ -153,7 +147,7 @@ with col_center:
 
     st.write("")
 
-    # Painel de Status / Resultado da Partida
+    # Painel de Status da Partida
     if st.session_state.game_over:
         if st.session_state.winner == 'you':
             st.success("🎉 Vitória espetacular! Você venceu o jogo!")
